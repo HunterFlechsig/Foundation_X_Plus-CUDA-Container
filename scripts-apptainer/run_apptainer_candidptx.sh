@@ -36,8 +36,28 @@
 
 set -euo pipefail
 
-REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+# SLURM copies this file to /var/spool/.../slurm_script, so BASH_SOURCE is
+# not the repo path. Prefer an explicit REPO_ROOT, then the sbatch cwd.
+if [[ -z "${REPO_ROOT:-}" ]]; then
+	if [[ -n "${SLURM_SUBMIT_DIR:-}" && -f "${SLURM_SUBMIT_DIR}/cuda-apptainer.sh" ]]; then
+		REPO_ROOT="${SLURM_SUBMIT_DIR}"
+	elif [[ -n "${SLURM_SUBMIT_DIR:-}" && -f "${SLURM_SUBMIT_DIR}/../cuda-apptainer.sh" ]]; then
+		REPO_ROOT="$(cd "${SLURM_SUBMIT_DIR}/.." && pwd)"
+	elif [[ -f "${PWD}/cuda-apptainer.sh" ]]; then
+		REPO_ROOT="${PWD}"
+	elif [[ -f "$(dirname "${BASH_SOURCE[0]}")/../cuda-apptainer.sh" ]]; then
+		REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+	fi
+fi
+if [[ -z "${REPO_ROOT:-}" || ! -f "${REPO_ROOT}/cuda-apptainer.sh" ]]; then
+	echo "Error: cuda-apptainer.sh not found. Submit from the repo root, or set REPO_ROOT." >&2
+	echo "PWD=${PWD}" >&2
+	echo "SLURM_SUBMIT_DIR=${SLURM_SUBMIT_DIR:-}" >&2
+	echo "BASH_SOURCE=${BASH_SOURCE[0]:-}" >&2
+	exit 1
+fi
 cd "$REPO_ROOT"
+echo "Repo root: ${REPO_ROOT}"
 
 declare -A TRAIN_TAGS=(
 	[candidptx_cls]="candidptxCLS"

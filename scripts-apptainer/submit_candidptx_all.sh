@@ -27,5 +27,6 @@ cd "$ROOT"
 for experiment in "${experiments[@]}"; do
 	echo "Submitting $experiment  (-A ${ACCOUNT} -p ${PARTITION} -q ${QOS})"
 	sbatch -A "$ACCOUNT" -p "$PARTITION" -q "$QOS" \
+		--chdir="$ROOT" --export=ALL,REPO_ROOT="$ROOT" \
 		--job-name="fx_${experiment}" "$RUNNER" "$experiment"
 done
