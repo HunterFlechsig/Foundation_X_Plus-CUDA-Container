@@ -6,6 +6,7 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=100G
 #SBATCH --time=7-00:00:00
+#SBATCH -A grp_jliang12
 #SBATCH -p public
 #SBATCH -q public
 #SBATCH --gres=gpu:a100:2
