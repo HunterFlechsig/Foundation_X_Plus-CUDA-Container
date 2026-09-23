@@ -17,9 +17,9 @@
 # Based on scripts-apptainer/run_apptainer_v108.sh.
 #
 # Trains only the tasks named by the experiment. Every epoch also evaluates
-# classification, localization, and segmentation so focused and unfocused
-# scores land in export_csvFile.csv. --saveAllModel writes
-# ckpt_E<epoch>_TH<head>.pth after each trained task.
+# CANDID-PTX classification, localization, and segmentation so focused and
+# unfocused scores land in export_csvFile.csv. Other datasets are not loaded.
+# --saveAllModel writes ckpt_E<epoch>_TH<head>.pth after each trained task.
 #
 #   sbatch ./scripts-apptainer/run_apptainer_candidptx.sh candidptx_cls
 #   TOTAL_EPOCHS=51 sbatch ./scripts-apptainer/run_apptainer_candidptx.sh candidptx_loc
