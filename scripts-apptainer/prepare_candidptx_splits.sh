@@ -2,13 +2,13 @@
 set -euo pipefail
 
 # Build CANDID-PTX split lists and localization PNGs from the raw release.
-#   ./scripts-apptainer/prepare_candidptx_splits.sh /scratch/$USER/CANDID-PTX
-#   ./scripts-apptainer/prepare_candidptx_splits.sh /scratch/$USER/CANDID-PTX --skip-png
+#   ./scripts-apptainer/prepare_candidptx_splits.sh /data/jliang12/shared/dataset/CANDID-PTX
+#   ./scripts-apptainer/prepare_candidptx_splits.sh /data/jliang12/shared/dataset/CANDID-PTX --skip-png
 #
 # Host python on SOL does not have pydicom. This falls through to the CUDA
 # Apptainer image, which installs it from requirements-cuda.txt.
 
-ROOT="/scratch/${USER}/CANDID-PTX"
+ROOT="/data/jliang12/shared/dataset/CANDID-PTX"
 if [[ $# -gt 0 && "$1" != --* ]]; then
     ROOT="$1"
     shift
@@ -35,8 +35,10 @@ fi
 
 echo "Host python3 has no pydicom. Running inside $IMAGE."
 binds=()
-if [[ -d /scratch ]]; then
-    binds+=(--bind "/scratch:/scratch:rw")
-fi
+for dir in /scratch /data; do
+    if [[ -d "$dir" ]]; then
+        binds+=(--bind "$dir:$dir:rw")
+    fi
+done
 exec apptainer exec "${binds[@]}" --bind "$REPO_DIR:/workspace" --pwd /workspace "$IMAGE" \
     python3 scripts-apptainer/prepare_candidptx_splits.py --root "$ROOT" "$@"

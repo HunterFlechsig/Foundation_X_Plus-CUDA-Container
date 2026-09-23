@@ -1663,6 +1663,9 @@ class SIIMPTX(Dataset):
 
 def read_candid_dicom(path):
     """Open a CANDID-PTX file that omits the DICOM Part-10 DICM prefix."""
+    settings = getattr(dicom.config, "settings", None)
+    if settings is not None and hasattr(settings, "reading_validation_mode"):
+        settings.reading_validation_mode = dicom.config.IGNORE
     dataset = dicom.dcmread(path, force=True)
     file_meta = getattr(dataset, "file_meta", None)
     if file_meta is None:

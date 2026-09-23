@@ -21,7 +21,7 @@ Segmentation lines are "<relative-dicom>,<rle or -1>".
 Localization JSON is COCO boxes around each pneumothorax region.
 Patients are kept in one split (70% train, 10% val, 20% test).
 
-    ./scripts-apptainer/prepare_candidptx_splits.sh /scratch/$USER/CANDID-PTX
+    ./scripts-apptainer/prepare_candidptx_splits.sh /data/jliang12/shared/dataset/CANDID-PTX
 
 The shell wrapper uses host python3 when it can import pydicom. On SOL it
 cannot, so the wrapper runs this file inside apptainer-cuda.sif instead.
@@ -203,10 +203,18 @@ def _dataset_inventory(dataset_dir):
     )
 
 
+def _allow_anonymized_uids(pydicom):
+    """CANDID-PTX UIDs keep leading zeros, which DICOM VR UI forbids."""
+    settings = getattr(pydicom.config, "settings", None)
+    if settings is not None and hasattr(settings, "reading_validation_mode"):
+        settings.reading_validation_mode = pydicom.config.IGNORE
+
+
 def _open_dicom(path, stop_before_pixels=False):
     """Open a CANDID-PTX file that omits the DICOM Part-10 DICM prefix."""
     import pydicom
 
+    _allow_anonymized_uids(pydicom)
     dataset = pydicom.dcmread(
         str(path), stop_before_pixels=stop_before_pixels, force=True
     )
@@ -532,7 +540,7 @@ def _write_summary(split_dir, records, unmatched_path):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--root", default="/scratch/hflechsi/CANDID-PTX")
+    parser.add_argument("--root", default="/data/jliang12/shared/dataset/CANDID-PTX")
     parser.add_argument("--csv", default="")
     parser.add_argument("--dataset", default="")
     parser.add_argument("--seed", type=int, default=42)
