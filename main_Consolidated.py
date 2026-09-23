@@ -39,7 +39,7 @@ from sklearn.metrics import roc_auc_score, accuracy_score
 from torchmetrics.functional.classification import multilabel_accuracy
 # Segmentation from Jiaxuan
 from utils_segmentation import load_popar_weight, AverageMeter, save_model, save_model2, dice_score, mean_dice_coef, torch_dice_coef_loss, exp_lr_scheduler_with_warmup, step_decay, load_swin_pretrained
-from datasets_medical import build_transform_segmentation, dataloader_return, PXSDataset, MontgomeryDataset, JSRTClavicleDataset, JSRTHeartDataset,JSRTLungDataset, VinDrRibCXRDataset, ChestXDetDataset, JSRTLungDataset, VindrCXRHeartDataset
+from datasets_medical import build_transform_segmentation, candidptx_only, dataloader_return, PXSDataset, MontgomeryDataset, JSRTClavicleDataset, JSRTHeartDataset,JSRTLungDataset, VinDrRibCXRDataset, ChestXDetDataset, JSRTLungDataset, VindrCXRHeartDataset
 from timm.utils import NativeScaler, ModelEma
 from models.load_weights_model import load_weights, load_weights_resume, load_weights_resume2, load_weights_foundationX
 import math
@@ -595,7 +595,8 @@ def evaluateLocSepFunc(epoch, datasetname__, task_todo, model, criterion, postpr
     log_writer_detection.close()
     # export_csvFile = pd.DataFrame(columns=['Epoch', 'Dataset', 'Task-Train', 'Model', 'Task-Test', 'AUC', 'mAP40','mAP50','mAP50_95', 'DICE'])
     # export_csvFile.to_csv(args.output_dir+'/export_csvFile.csv', index=False)
-    fields=[epoch, task_todo, datasetname__, 'Student', 'Localization_'+datasetname__, '-', 100*value[1], 100*value[2], 100*value[0], '-'] # AUC_SliceLevel_Res
+    bbox_stats = test_stats['coco_eval_bbox']
+    fields=[epoch, task_todo, datasetname__, 'Student', 'Localization_'+datasetname__, '-', 100*bbox_stats[1], 100*bbox_stats[2], 100*bbox_stats[0], '-'] # AUC_SliceLevel_Res
     with open(args.output_dir+'/export_csvFile.csv', 'a') as f:
         writer = csv.writer(f)
         writer.writerow(fields)
@@ -620,7 +621,8 @@ def evaluateLocSepFunc(epoch, datasetname__, task_todo, model, criterion, postpr
         log_writer_detection.write('\n')
         log_writer_detection.write('\n')
         log_writer_detection.close()
-        fields=[epoch, task_todo, datasetname__, 'Teacher', 'Localization_'+datasetname__, '-', 100*value[1], 100*value[2], 100*value[0], '-'] # AUC_SliceLevel_Res
+        bbox_stats = test_stats['coco_eval_bbox']
+        fields=[epoch, task_todo, datasetname__, 'Teacher', 'Localization_'+datasetname__, '-', 100*bbox_stats[1], 100*bbox_stats[2], 100*bbox_stats[0], '-'] # AUC_SliceLevel_Res
         with open(args.output_dir+'/export_csvFile.csv', 'a') as f:
             writer = csv.writer(f)
             writer.writerow(fields)
@@ -3368,12 +3370,12 @@ def main(args):
             train_loader_loc_RSNApneumonia, test_loader_loc_RSNApneumonia, dataset_val_loc_RSNApneumonia, sampler_train_RSNApneumonia, \
             train_loader_loc_SiimACR, test_loader_loc_SiimACR, dataset_val_loc_SiimACR, sampler_train_SiimACR, \
             train_loader_seg_ChestXDet, test_loader_seg_ChestXDet, train_loader_seg_SIIM, test_loader_seg_SIIM, train_loader_seg_CANDIDptx, test_loader_seg_CANDIDptx = dataloader_return(args)
-            base_ds_TBX11k = get_coco_api_from_dataset(dataset_val_loc_TBX11k)
-            base_ds_Node21 = get_coco_api_from_dataset(dataset_val_loc_Node21)
-            base_ds_ChestXDet = get_coco_api_from_dataset(dataset_val_loc_ChestXDet)
+            base_ds_TBX11k = get_coco_api_from_dataset(dataset_val_loc_TBX11k) if dataset_val_loc_TBX11k is not None else None
+            base_ds_Node21 = get_coco_api_from_dataset(dataset_val_loc_Node21) if dataset_val_loc_Node21 is not None else None
+            base_ds_ChestXDet = get_coco_api_from_dataset(dataset_val_loc_ChestXDet) if dataset_val_loc_ChestXDet is not None else None
             base_ds_CANDIDptx = get_coco_api_from_dataset(dataset_val_loc_CANDIDptx)
-            base_ds_RSNApneumonia = get_coco_api_from_dataset(dataset_val_loc_RSNApneumonia)
-            base_ds_SiimACR = get_coco_api_from_dataset(dataset_val_loc_SiimACR)
+            base_ds_RSNApneumonia = get_coco_api_from_dataset(dataset_val_loc_RSNApneumonia) if dataset_val_loc_RSNApneumonia is not None else None
+            base_ds_SiimACR = get_coco_api_from_dataset(dataset_val_loc_SiimACR) if dataset_val_loc_SiimACR is not None else None
             del dataset_val_loc_TBX11k, dataset_val_loc_Node21, dataset_val_loc_ChestXDet
             # for name, param in model.named_parameters(): ### WHY!!!!!! -- 26th June 2024!!
             #     if ('decoder.1' in name) or ('decoder.2' in name) or ('segmentation' in name): ## Only Localization Encoder
@@ -11328,7 +11330,7 @@ def main(args):
                     torch.cuda.synchronize()
                     torch.cuda.empty_cache()
                     gc.collect()
-                if 'candidptxCLS' in args.cyclictask:
+                if 'candidptxCLS' in args.cyclictask or candidptx_only(args.cyclictask):
                     datasetname__ = "CANDID-PTX"
                     head_number_temp = DATASETS_HEADS["CANDIDPTX_CLS"]
                     task_cls_type_temp = 'nonBinary'
@@ -11391,7 +11393,7 @@ def main(args):
                     torch.cuda.synchronize()
                     torch.cuda.empty_cache()
                     gc.collect()
-                if 'candidptxLOC' in args.cyclictask:
+                if 'candidptxLOC' in args.cyclictask or candidptx_only(args.cyclictask):
                     datasetname__ = "CANDID-PTX"
                     model.task_DetHead = DATASETS_HEADS["CANDIDPTX_LOC"]
                     if model_ema is not None:
@@ -11442,7 +11444,7 @@ def main(args):
 
 
                 ### Test SEGMENTATION ##
-                if 'candidptxSEG' in args.cyclictask:
+                if 'candidptxSEG' in args.cyclictask or candidptx_only(args.cyclictask):
                     datasetname__ = "CANDID-PTX"
                     head_number_temp = DATASETS_HEADS["CANDIDPTX_SEG"]
                     test_loader_loc_temp = test_loader_seg_CANDIDptx
