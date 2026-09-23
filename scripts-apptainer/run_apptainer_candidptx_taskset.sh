@@ -142,7 +142,7 @@ DEFAULT_BIND_DIRS="$DEFAULT_BIND_DIRS" ./cuda-apptainer.sh exec env \
 	--total_epochs "$total_epochs" --batch_size "$BATCHSIZE" --opt "$opt" \
 	--finetune_ignore label_enc.weight class_embed \
 	--backbone_dir "$backbone_dir" --lr_backbone "$lr_backbone" --lr_locEnc "$lr_locEnc" --lr_locDec "$lr_locDec" --lr_segmentor "$lr_segmentor" \
-	--cyclictask "$cyclictask" --modelEMA "$EMAMODE" --lockrelease --saveAllModel \
+	--cyclictask "$cyclictask" --modelEMA "$EMAMODE" --lockrelease --saveAllModel --find_unused_params \
 	"${RESUME_ARGS[@]}" \
 	--options dn_scalar=100 embed_init_tgt=TRUE \
 	dn_label_coef=1.0 dn_bbox_coef=1.0 use_ema=False \
