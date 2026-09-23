@@ -23,12 +23,8 @@ Patients are kept in one split (70% train, 10% val, 20% test).
 
     ./scripts-apptainer/prepare_candidptx_splits.sh /scratch/$USER/CANDID-PTX
 
-Run it where numpy, pydicom, and Pillow are installed. On SOL that is inside
-the container:
-
-    cd /scratch/$USER/Foundation_X_Plus-CUDA-Container
-    ./cuda-apptainer.sh exec python3 scripts-apptainer/prepare_candidptx_splits.py \\
-        --root /scratch/$USER/CANDID-PTX
+The shell wrapper uses host python3 when it can import pydicom. On SOL it
+cannot, so the wrapper runs this file inside apptainer-cuda.sif instead.
 """
 
 import argparse
@@ -296,6 +292,12 @@ def _match_images(dataset_dir, grouped, csv_patients):
             print("  headers %d/%d" % (index, len(files)))
         try:
             sop, patient, rows, cols = _read_header(path)
+        except ImportError as exc:
+            missing = getattr(exc, "name", None) or "pydicom"
+            raise SystemExit(
+                "This python cannot import %s. Run ./scripts-apptainer/prepare_candidptx_splits.sh "
+                "so it uses apptainer-cuda.sif." % missing
+            ) from None
         except Exception as exc:
             print("  skip unreadable %s (%s)" % (path, exc))
             continue
