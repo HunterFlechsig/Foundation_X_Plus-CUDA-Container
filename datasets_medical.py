@@ -1661,6 +1661,18 @@ class SIIMPTX(Dataset):
         return len(self.img_list)
 
 
+def read_candid_dicom(path):
+    """Open a CANDID-PTX file that omits the DICOM Part-10 DICM prefix."""
+    dataset = dicom.dcmread(path, force=True)
+    file_meta = getattr(dataset, "file_meta", None)
+    if file_meta is None:
+        dataset.file_meta = dicom.dataset.FileMetaDataset()
+        file_meta = dataset.file_meta
+    if not getattr(file_meta, "TransferSyntaxUID", None):
+        file_meta.TransferSyntaxUID = dicom.uid.ImplicitVRLittleEndian
+    return dataset
+
+
 ## CANDID-PTX Classification Dataloader
 class CANDIDPTX(Dataset):
     def __init__(self, images_path, file_path, augment, num_class=1, use_dicom=False):
@@ -1685,7 +1697,7 @@ class CANDIDPTX(Dataset):
     def __getitem__(self, index):
         imagePath = self.img_list[index]
         if self.use_dicom:
-            im_array = dicom.dcmread(imagePath).pixel_array
+            im_array = read_candid_dicom(imagePath).pixel_array
             imageData = Image.fromarray(im_array).convert("RGB")
         else:
             imageData = Image.open(_resolve_image_path(imagePath)).convert("RGB")
@@ -2569,7 +2581,7 @@ class Candid_PTX_PXSDataset(Dataset):
         imagePath = self.img_list[idx]
         maskrle = self.img_label[idx]
 
-        imageData = dicom.dcmread(imagePath).pixel_array
+        imageData = read_candid_dicom(imagePath).pixel_array
         imageData = (
             (imageData - imageData.min())
             * (1 / (imageData.max() - imageData.min()) * 255)

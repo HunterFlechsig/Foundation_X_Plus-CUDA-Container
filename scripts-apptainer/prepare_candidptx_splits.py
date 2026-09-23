@@ -165,10 +165,24 @@ def _index_dicoms(dataset_dir):
     return files, by_stem
 
 
-def _read_header(path):
+def _open_dicom(path, stop_before_pixels=False):
+    """Open a CANDID-PTX file that omits the DICOM Part-10 DICM prefix."""
     import pydicom
 
-    dataset = pydicom.dcmread(str(path), stop_before_pixels=True, force=True)
+    dataset = pydicom.dcmread(
+        str(path), stop_before_pixels=stop_before_pixels, force=True
+    )
+    file_meta = getattr(dataset, "file_meta", None)
+    if file_meta is None:
+        dataset.file_meta = pydicom.dataset.FileMetaDataset()
+        file_meta = dataset.file_meta
+    if not getattr(file_meta, "TransferSyntaxUID", None):
+        file_meta.TransferSyntaxUID = pydicom.uid.ImplicitVRLittleEndian
+    return dataset
+
+
+def _read_header(path):
+    dataset = _open_dicom(path, stop_before_pixels=True)
     sop = str(getattr(dataset, "SOPInstanceUID", "") or "").strip()
     patient = str(getattr(dataset, "PatientID", "") or "").strip()
     rows = int(getattr(dataset, "Rows", 0) or 0)
@@ -417,7 +431,6 @@ def _dicom_to_uint8(dataset):
 
 
 def _write_pngs(records, png_root, overwrite):
-    import pydicom
     from PIL import Image
 
     written = 0
@@ -428,7 +441,7 @@ def _write_pngs(records, png_root, overwrite):
             skipped += 1
             continue
         destination.parent.mkdir(parents=True, exist_ok=True)
-        dataset = pydicom.dcmread(str(record["path"]), force=True)
+        dataset = _open_dicom(record["path"])
         image = Image.fromarray(_dicom_to_uint8(dataset)).convert("RGB")
         image.save(destination)
         written += 1
