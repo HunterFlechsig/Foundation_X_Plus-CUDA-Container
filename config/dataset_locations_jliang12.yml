@@ -82,15 +82,15 @@ classification:
   candid_ptx:
     # Classification uses DICOM images; localization uses PNG + JSON bbox files.
     use_dicom: true
-    images_dicom: /data/jliang12/jpang12/dataset/CANDID-PTX/dataset
-    images: /data/jliang12/jpang12/dataset/CANDID-PTX/png
+    images_dicom: /scratch/hflechsi/CANDID-PTX/dataset
+    images: /scratch/hflechsi/CANDID-PTX/png
     splits:
-      train: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_train.txt
-      val: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_val.txt
-      test: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_test.txt
-      train_json: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_train_1.json
-      val_json: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_valid_1.json
-      test_json: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_test_1.json
+      train: /scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_train.txt
+      val: /scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_val.txt
+      test: /scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_test.txt
+      train_json: /scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_train_1.json
+      val_json: /scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_valid_1.json
+      test_json: /scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_test_1.json
 
 # -----------------------------------------------------------------------------------------------------------------------
 localization:
@@ -133,11 +133,11 @@ localization:
 
   candid_ptx:
     # Localization uses PNG images with COCO-format JSON bbox annotations.
-    images: /data/jliang12/jpang12/dataset/CANDID-PTX/png
+    images: /scratch/hflechsi/CANDID-PTX/png
     splits:
-      train_json: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_train_1.json
-      val_json: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_valid_1.json
-      test_json: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_test_1.json
+      train_json: /scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_train_1.json
+      val_json: /scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_valid_1.json
+      test_json: /scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_test_1.json
 
 # -----------------------------------------------------------------------------------------------------------------------
 segmentation:
@@ -161,6 +161,6 @@ segmentation:
 
   candid_ptx:
     use_dicom: true
-    images: /data/jliang12/jpang12/dataset/CANDID-PTX/dataset
-    train_list: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/train.txt
-    test_list: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/test.txt
+    images: /scratch/hflechsi/CANDID-PTX/dataset
+    train_list: /scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/train.txt
+    test_list: /scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/test.txt

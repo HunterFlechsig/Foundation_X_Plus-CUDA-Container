@@ -123,21 +123,21 @@ DATASETS_CONFIG = {
     "seg_siimacr_testList": DATASET_DIR + "pxs/test.txt",
 
     # CANDID-PTX - Classification - Localization - Segmentation
-    "cls_candidptx_root": DATASET_DIR + "CANDID-PTX/",
-    "cls_candidptx_trainList": DATASET_DIR + "CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_train.txt",
-    "cls_candidptx_valList": DATASET_DIR + "CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_val.txt",
-    "cls_candidptx_testList": DATASET_DIR + "CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_test.txt",
+    "cls_candidptx_root": "/scratch/hflechsi/CANDID-PTX/",
+    "cls_candidptx_trainList": "/scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_train.txt",
+    "cls_candidptx_valList": "/scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_val.txt",
+    "cls_candidptx_testList": "/scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_test.txt",
 
     "loc_candidptx_trainTag": "candidptx_pneumothorax_train_full",
     "loc_candidptx_testTag": "candidptx_pneumothorax_val",
-    "loc_candidptx_root": DATASET_DIR + "CANDID-PTX/png",
-    "loc_candidptx_trainList": DATASET_DIR + "CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_train_1.json",
-    "loc_candidptx_valList": DATASET_DIR + "CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_valid_1.json",
-    "loc_candidptx_testList": DATASET_DIR + "CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_test_1.json",
+    "loc_candidptx_root": "/scratch/hflechsi/CANDID-PTX/png",
+    "loc_candidptx_trainList": "/scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_train_1.json",
+    "loc_candidptx_valList": "/scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_valid_1.json",
+    "loc_candidptx_testList": "/scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_test_1.json",
 
-    "seg_candidptx_root": DATASET_DIR + "CANDID-PTX/dataset",
-    "seg_candidptx_trainList": DATASET_DIR + "CANDID-PTX/data_files_splits/candid_ptx/train.txt",
-    "seg_candidptx_testList": DATASET_DIR + "CANDID-PTX/data_files_splits/candid_ptx/test.txt",
+    "seg_candidptx_root": "/scratch/hflechsi/CANDID-PTX/dataset",
+    "seg_candidptx_trainList": "/scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/train.txt",
+    "seg_candidptx_testList": "/scratch/hflechsi/CANDID-PTX/data_files_splits/candid_ptx/test.txt",
 
 
     # RSNA PE - Classification - Localization
