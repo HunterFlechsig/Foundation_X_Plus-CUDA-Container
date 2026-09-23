@@ -75,12 +75,12 @@ cyclictask="${train_tags}_${EVAL_SUFFIX}"
 CONFIGFILE=config/DINO/DINO_4scale_swinBASE.py
 LOGFILE=${LOGFILE:-${SCRATCH:-/scratch/$USER}/FoundationX/candidptx/${experiment}}
 
-backbone_dir=/scratch/sejong/class-dataset/models/Ark_models/TSconsist_NoOD_MIMIC_CheXpert_ChestXray14_RSNAPneumonia_VinDrCXR_Shenzhen_ep200.pth.tar
+backbone_dir=/data/jliang12/dongaoma/Ark_models/TSconsist_NoOD_MIMIC_CheXpert_ChestXray14_RSNAPneumonia_VinDrCXR_Shenzhen_ep200.pth.tar
 
 BACKBONEMODEL=Swin-B # Swin-T, Swin-B, Swin-L
 IMGSIZE=224 # 448
 
-coco_path=/scratch/sejong/class-dataset/VinDr-CXR/
+coco_path=/data/jliang12/jpang12/dataset/VinDr-CXR/
 
 DATASETFILE=foundation6Ark6_datasets
 
@@ -97,7 +97,7 @@ total_epochs=${TOTAL_EPOCHS:-51}
 opt=${opt:-adamw} # sgd adamw
 EMAMODE=${EMAMODE:-True_Epoch}
 
-DATASET_LOCATIONS_YML=${DATASET_LOCATIONS_YML:-config/dataset_locations_asu_sol.yml}
+DATASET_LOCATIONS_YML=${DATASET_LOCATIONS_YML:-config/dataset_locations_jliang12.yml}
 
 # Lightweight sanity run mode:
 # DEBUG_RUN=true ./scripts-apptainer/run_apptainer_candidptx.sh candidptx_cls
@@ -116,10 +116,10 @@ if [[ "$DEBUG_RUN" == "true" ]]; then
 fi
 
 # Mount policy:
-# - default: bind /scratch (not just /scratch/sejong — binding a subdirectory when the
-#   parent doesn't exist in the SIF overlay causes unreliable mounts in worker processes)
-# - set MOUNT_DATA=true to also bind /data/jliang12
-MOUNT_DATA=${MOUNT_DATA:-false}
+# - /scratch stays mounted for the repo, the SIF, and job logs
+# - /data/jliang12 is mounted because dataset paths live there
+# - set MOUNT_DATA=false to bind /scratch only
+MOUNT_DATA=${MOUNT_DATA:-true}
 DEFAULT_BIND_DIRS="/scratch"
 if [[ "$MOUNT_DATA" == "true" ]]; then
 	DEFAULT_BIND_DIRS="/scratch /data/jliang12"

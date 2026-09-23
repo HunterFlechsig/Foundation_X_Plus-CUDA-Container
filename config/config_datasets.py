@@ -1,7 +1,7 @@
 import os
 import yaml
 
-DATASET_DIR = "/scratch/sejong/class-dataset/" ## For SOL
+DATASET_DIR = "/data/jliang12/jpang12/dataset/" ## For SOL
 # DATASET_DIR = "/scratch/nuislam/Data/" ## For PHX
 
 DATASETS_CONFIG = {

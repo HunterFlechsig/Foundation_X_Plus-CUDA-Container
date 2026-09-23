@@ -1,0 +1,166 @@
+# Same layout as dataset_locations_asu_sol.yml, rooted at /data/jliang12/jpang12/dataset
+# instead of /scratch/sejong/class-dataset. Requires the /data/jliang12 bind mount.
+roots:
+  classroom: /data/jliang12/jpang12/dataset
+
+directories:
+  jsrt_all247images: /data/jliang12/jpang12/dataset/JSRT/All247images
+  nih_chestxray14_images: /data/jliang12/jpang12/dataset/cxr-256/nih_xray14/images/images
+  chexpert_v1_root: /data/jliang12/jpang12/dataset/cxr-256/CheXpert
+  ptx_stage2_images: /data/jliang12/jpang12/dataset/Pneumothorax_segmentation/stage_2_images
+
+classification:
+  nih_chestxray14:
+    images: /data/jliang12/jpang12/dataset/cxr-256/nih_xray14/images/images
+    splits:
+      train: /data/jliang12/jpang12/dataset/cxr-256/nih_xray14/data_files_splits/xray14/official/train_official.txt
+      val: /data/jliang12/jpang12/dataset/cxr-256/nih_xray14/data_files_splits/xray14/official/val_official.txt
+      test: /data/jliang12/jpang12/dataset/cxr-256/nih_xray14/data_files_splits/xray14/official/test_official.txt
+
+  chexpert:
+    images: /data/jliang12/jpang12/dataset/cxr-256/CheXpert
+    splits:
+      train: /data/jliang12/jpang12/dataset/cxr-256/CheXpert/data_files_splits/ark6_classificationTask/CheXpert-v1.0_train.csv
+      val: /data/jliang12/jpang12/dataset/cxr-256/CheXpert/data_files_splits/ark6_classificationTask/CheXpert-v1.0_valid.csv
+      test: /data/jliang12/jpang12/dataset/cxr-256/CheXpert/data_files_splits/ark6_classificationTask/CheXpert_test_official.csv
+
+  mimic_cxr:
+    images: /data/jliang12/jpang12/dataset/cxr-256/MIMIC_jpeg
+    splits:
+      train: /data/jliang12/jpang12/dataset/cxr-256/MIMIC_jpeg/data_files_splits/ark6_classificationTask/mimic-cxr-2.0.0-train.csv
+      val: /data/jliang12/jpang12/dataset/cxr-256/MIMIC_jpeg/data_files_splits/ark6_classificationTask/mimic-cxr-2.0.0-validate.csv
+      test: /data/jliang12/jpang12/dataset/cxr-256/MIMIC_jpeg/data_files_splits/ark6_classificationTask/mimic-cxr-2.0.0-test.csv
+
+  vindr_cxr:
+    images: /data/jliang12/jpang12/dataset/cxr-256/vindr_cxr
+    splits:
+      train: /data/jliang12/jpang12/dataset/cxr-256/vindr_cxr/data_files_splits/ark6_classificationTask/VinDrCXR_train_pe_global_one.txt
+      val: /data/jliang12/jpang12/dataset/cxr-256/vindr_cxr/data_files_splits/ark6_classificationTask/VinDrCXR_test_pe_global_one.txt
+      test: /data/jliang12/jpang12/dataset/cxr-256/vindr_cxr/data_files_splits/ark6_classificationTask/VinDrCXR_test_pe_global_one.txt
+
+  shenzhen:
+    images: /data/jliang12/jpang12/dataset/shenzhen/CXR_png
+    splits:
+      train: /data/jliang12/jpang12/dataset/shenzhen/data_files_splits/ark6_classificationTask/ShenzenCXR_train_data.txt
+      val: /data/jliang12/jpang12/dataset/shenzhen/data_files_splits/ark6_classificationTask/ShenzenCXR_valid_data.txt
+      test: /data/jliang12/jpang12/dataset/shenzhen/data_files_splits/ark6_classificationTask/ShenzenCXR_test_data.txt
+
+  tbx11k:
+    images: /data/jliang12/jpang12/dataset/TBX11K/imgs
+    splits:
+      train: /data/jliang12/jpang12/dataset/TBX11K/lists/TBX11K_train.txt
+      test: /data/jliang12/jpang12/dataset/TBX11K/lists/TBX11K_val.txt
+
+  node21:
+    images: /data/jliang12/jpang12/dataset/NODE21/png_images
+    splits:
+      train: /data/jliang12/jpang12/dataset/NODE21/data_files_splits/node21_dataset/train.txt
+      test: /data/jliang12/jpang12/dataset/NODE21/data_files_splits/node21_dataset/test.txt
+      train_json: /data/jliang12/jpang12/dataset/NODE21/data_files_splits/node21_dataset/Node21_Nodule_Bbox_NAD_train_3.json
+      test_json: /data/jliang12/jpang12/dataset/NODE21/data_files_splits/node21_dataset/Node21_Nodule_Bbox_NAD_test_3.json
+
+  chestx_det:
+    images: /data/jliang12/jpang12/dataset/ChestX-Det
+    splits:
+      train_json: /data/jliang12/jpang12/dataset/ChestX-Det/ChestX_det_train_NAD_v2.json
+      test_json: /data/jliang12/jpang12/dataset/ChestX-Det/ChestX_det_test_NAD_v2.json
+
+  rsna_pneumonia:
+    images: /data/jliang12/jpang12/dataset/rsna-pneumonia/stage_2_train_images_png
+    splits:
+      train: /data/jliang12/jpang12/dataset/rsna-pneumonia/data_files_splits/rsna_pneumonia/RSNAPneumonia_train.txt
+      val: /data/jliang12/jpang12/dataset/rsna-pneumonia/data_files_splits/rsna_pneumonia/RSNAPneumonia_val.txt
+      test: /data/jliang12/jpang12/dataset/rsna-pneumonia/data_files_splits/rsna_pneumonia/RSNAPneumonia_test.txt
+
+  siim_acr_ptx:
+    images: /data/jliang12/jpang12/dataset/SIIM-ACR-Pneumothorax
+    splits:
+      train: /data/jliang12/jpang12/dataset/SIIM-ACR-Pneumothorax/data_files_splits/siimacr_ptx/SIIMPTX_cls_train.txt
+      val: /data/jliang12/jpang12/dataset/SIIM-ACR-Pneumothorax/data_files_splits/siimacr_ptx/SIIMPTX_cls_val.txt
+      test: /data/jliang12/jpang12/dataset/SIIM-ACR-Pneumothorax/data_files_splits/siimacr_ptx/SIIMPTX_cls_test.txt
+
+  candid_ptx:
+    # Classification uses DICOM images; localization uses PNG + JSON bbox files.
+    use_dicom: true
+    images_dicom: /data/jliang12/jpang12/dataset/CANDID-PTX/dataset
+    images: /data/jliang12/jpang12/dataset/CANDID-PTX/png
+    splits:
+      train: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_train.txt
+      val: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_val.txt
+      test: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDIDPTX_cls_test.txt
+      train_json: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_train_1.json
+      val_json: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_valid_1.json
+      test_json: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_test_1.json
+
+# -----------------------------------------------------------------------------------------------------------------------
+localization:
+  tbx11k:
+    images: /data/jliang12/jpang12/dataset/TBX11K/imgs
+    splits:
+      train_json: /data/jliang12/jpang12/dataset/TBX11K/annotations/json/all_train.json
+      test_json: /data/jliang12/jpang12/dataset/TBX11K/annotations/json/all_val.json
+
+  node21:
+    images: /data/jliang12/jpang12/dataset/NODE21/png_images
+    splits:
+      train_json: /data/jliang12/jpang12/dataset/NODE21/data_files_splits/node21_dataset/Node21_Nodule_Bbox_NAD_train_3.json
+      test_json: /data/jliang12/jpang12/dataset/NODE21/data_files_splits/node21_dataset/Node21_Nodule_Bbox_NAD_test_3.json
+
+  chestx_det:
+    # Localization uses separate train/test image directories.
+    images_train: /data/jliang12/jpang12/dataset/ChestX-Det/train
+    images_test: /data/jliang12/jpang12/dataset/ChestX-Det/test
+    splits:
+      train_json: /data/jliang12/jpang12/dataset/ChestX-Det/ChestX_det_train_NAD_v2.json
+      test_json: /data/jliang12/jpang12/dataset/ChestX-Det/ChestX_det_test_NAD_v2.json
+
+  rsna_pneumonia:
+    images: /data/jliang12/jpang12/dataset/rsna-pneumonia/stage_2_train_images_png
+    splits:
+      train_json: /data/jliang12/jpang12/dataset/rsna-pneumonia/data_files_splits/rsna_pneumonia/rsnaPneumoniaDetection_Train.json
+      val_json: /data/jliang12/jpang12/dataset/rsna-pneumonia/data_files_splits/rsna_pneumonia/rsnaPneumoniaDetection_Valid.json
+      test_json: /data/jliang12/jpang12/dataset/rsna-pneumonia/data_files_splits/rsna_pneumonia/rsnaPneumoniaDetection_Test.json
+
+  siim_acr_ptx:
+    # Localization uses separate train/val/test image directories.
+    images_train: /data/jliang12/jpang12/dataset/SIIM-ACR-Pneumothorax/train_jpeg
+    images_val: /data/jliang12/jpang12/dataset/SIIM-ACR-Pneumothorax/val_jpeg
+    images_test: /data/jliang12/jpang12/dataset/SIIM-ACR-Pneumothorax/test_jpeg
+    splits:
+      train_json: /data/jliang12/jpang12/dataset/SIIM-ACR-Pneumothorax/data_files_splits/siimacr_ptx/siim_pneumothorax_train_coco.json
+      val_json: /data/jliang12/jpang12/dataset/SIIM-ACR-Pneumothorax/data_files_splits/siimacr_ptx/siim_pneumothorax_val_coco.json
+      test_json: /data/jliang12/jpang12/dataset/SIIM-ACR-Pneumothorax/data_files_splits/siimacr_ptx/siim_pneumothorax_test_coco.json
+
+  candid_ptx:
+    # Localization uses PNG images with COCO-format JSON bbox annotations.
+    images: /data/jliang12/jpang12/dataset/CANDID-PTX/png
+    splits:
+      train_json: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_train_1.json
+      val_json: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_valid_1.json
+      test_json: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/CANDID_PTX_test_1.json
+
+# -----------------------------------------------------------------------------------------------------------------------
+segmentation:
+  inspect:
+    images: /data/jliang12/jpang12/dataset/stanford/INSPECT-Multaimodal-PE/full/CTPA
+    splits:
+      train_list: /data/jliang12/jpang12/dataset/INSPECT-Multimodal-PE/CT_INSPECT_26gb/INSPECT_Official_TrainList.csv
+      test_list: /data/jliang12/jpang12/dataset/INSPECT-Multimodal-PE/CT_INSPECT_26gb/INSPECT_Official_TestList.csv
+
+  chestx_det:
+    images_train: /data/jliang12/jpang12/dataset/ChestX-Det/train
+    masks_train: /data/jliang12/jpang12/dataset/ChestX-Det/train_binary_mask
+    images_test: /data/jliang12/jpang12/dataset/ChestX-Det/test
+    masks_test: /data/jliang12/jpang12/dataset/ChestX-Det/test_binary_mask
+
+  siim_acr_ptx:
+    images_train: /data/jliang12/jpang12/dataset/SIIM-ACR-Pneumothorax/train_jpeg
+    images_test: /data/jliang12/jpang12/dataset/SIIM-ACR-Pneumothorax/test_jpeg
+    train_list: /data/jliang12/jpang12/dataset/pxs/train.txt
+    test_list: /data/jliang12/jpang12/dataset/pxs/test.txt
+
+  candid_ptx:
+    use_dicom: true
+    images: /data/jliang12/jpang12/dataset/CANDID-PTX/dataset
+    train_list: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/train.txt
+    test_list: /data/jliang12/jpang12/dataset/CANDID-PTX/data_files_splits/candid_ptx/test.txt
