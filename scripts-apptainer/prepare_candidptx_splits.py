@@ -143,26 +143,68 @@ def _self_test():
         raise SystemExit("bbox missing for a one-pixel mask")
     if "-1" != mask_to_rle(np.zeros((cols, rows), dtype=np.uint8), rows, cols):
         raise SystemExit("empty mask did not encode as -1")
+    names = (
+        Path("1.2.840.113619.2.55.3.1"),
+        Path("7_20150101_1.2.840.113619.2.55.3.1"),
+        Path("7_20150101_1.2.840.113619.2.55.3.1.dcm"),
+        Path("image.png"),
+        Path("notes.csv"),
+    )
+    accepted = [_is_image_file(path) for path in names]
+    if accepted != [True, True, True, False, False]:
+        raise SystemExit("DICOM name check failed: %s" % accepted)
     print("RLE self-test ok (%s)" % merged)
 
 
 def _is_image_file(path):
     if path.name.startswith("."):
         return False
-    if path.suffix.lower() in IMAGE_SUFFIXES:
+    suffix = path.suffix.lower()
+    if suffix in IMAGE_SUFFIXES or suffix == "":
         return True
-    return path.suffix == ""
+    # Filenames are "{patient}_{date}_{SOPInstanceUID}" with no .dcm.
+    # The UID's last component makes pathlib report a suffix like ".1".
+    return len(suffix) > 1 and suffix[1:].isdigit()
 
 
 def _index_dicoms(dataset_dir):
     files = [path for path in dataset_dir.rglob("*") if path.is_file() and _is_image_file(path)]
-    suffixed = [path for path in files if path.suffix.lower() in IMAGE_SUFFIXES]
-    if suffixed:
-        files = suffixed
     by_stem = {}
     for path in files:
+        by_stem.setdefault(path.name.lower(), path)
         by_stem.setdefault(path.stem.lower(), path)
     return files, by_stem
+
+
+def _dataset_inventory(dataset_dir):
+    if not dataset_dir.is_dir():
+        return "Missing directory %s" % dataset_dir
+    counts = {}
+    examples = []
+    total = 0
+    for path in dataset_dir.rglob("*"):
+        if not path.is_file() or path.name.startswith("."):
+            continue
+        total += 1
+        suffix = path.suffix.lower()
+        if suffix == "":
+            label = "no-extension"
+        elif len(suffix) > 1 and suffix[1:].isdigit():
+            label = "sop-uid-name"
+        else:
+            label = suffix
+        counts[label] = counts.get(label, 0) + 1
+        if len(examples) < 5:
+            examples.append(path.relative_to(dataset_dir).as_posix())
+    if total == 0:
+        return "No files under %s" % dataset_dir
+    summary = ", ".join("%s=%d" % item for item in sorted(counts.items()))
+    return "Found %d files under %s (%s). Examples: %s" % (
+        total,
+        dataset_dir,
+        summary,
+        "; ".join(examples),
+    )
 
 
 def _open_dicom(path, stop_before_pixels=False):
@@ -232,7 +274,19 @@ def _load_reports(csv_path):
 def _match_images(dataset_dir, grouped, csv_patients):
     files, by_stem = _index_dicoms(dataset_dir)
     if not files:
-        raise SystemExit("No DICOM files under %s" % dataset_dir)
+        siblings = []
+        if dataset_dir.parent.is_dir():
+            siblings = [
+                child.name
+                for child in sorted(dataset_dir.parent.iterdir())
+                if child.is_dir() and child.resolve() != dataset_dir.resolve() and not child.name.startswith(".")
+            ]
+        hint = ""
+        if siblings:
+            hint = " Other folders in %s: %s." % (dataset_dir.parent, ", ".join(siblings[:12]))
+        raise SystemExit(
+            "No DICOM files under %s. %s%s" % (dataset_dir, _dataset_inventory(dataset_dir), hint)
+        )
 
     print("Reading DICOM headers for %d files" % len(files))
     header_by_path = {}
