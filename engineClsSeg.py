@@ -334,12 +334,6 @@ def train_one_epoch_SEGMENTATION(args, model, train_loader, optimizer, loss_scal
         optimizer.zero_grad(set_to_none=True)
         is_second_order = hasattr(optimizer, 'is_second_order') and optimizer.is_second_order
 
-        # --- DDP DYNAMIC FREEZE WORKAROUND (PRE-BACKWARD) ---
-        # seeding zeros to satisfy DDP reducer
-        for param in model.parameters():
-            if not param.requires_grad and param.grad is None:
-                param.grad = torch.zeros_like(param.data)
-
         # Unrolling loss_scaler to inject post-backward hook
         loss_scaler._scaler.scale(loss).backward(create_graph=is_second_order)
 

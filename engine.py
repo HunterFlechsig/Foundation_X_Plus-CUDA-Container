@@ -284,16 +284,6 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         # amp backward function
         if args.amp:
             optimizer.zero_grad(set_to_none=True)
-
-            # --- DDP DYNAMIC FREEZE WORKAROUND (PRE-BACKWARD) ---
-            # DDP expects gradients for bucketed layers even if requires_grad=False.
-            # When find_unused_parameters=True is active, DDP reducer still expects
-            # gradients for buckted parameters if they were originally part of the 
-            # DDP bucket graph at initialization. seeding zeros satisfies this.
-            for param in model.parameters():
-                if not param.requires_grad and param.grad is None:
-                    param.grad = torch.zeros_like(param.data)
-
             scaler.scale(losses).backward()
 
             # --- DDP DYNAMIC FREEZE WORKAROUND (POST-BACKWARD) ---
@@ -310,12 +300,6 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         else:
             # original backward function
             optimizer.zero_grad(set_to_none=True)
-
-            # --- DDP DYNAMIC FREEZE WORKAROUND (PRE-BACKWARD) ---
-            for param in model.parameters():
-                if not param.requires_grad and param.grad is None:
-                    param.grad = torch.zeros_like(param.data)
-
             losses.backward()
 
             # --- DDP DYNAMIC FREEZE WORKAROUND (POST-BACKWARD) ---
