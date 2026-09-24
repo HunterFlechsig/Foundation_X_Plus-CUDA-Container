@@ -301,6 +301,11 @@ def Freeze_Backbone_and_Localization_Encoder_and_Localization_Decoder(model, Dec
         if ('tgt_embed.'+str(DecTaskHead) in name): ## Learnable Content Queries
             param.requires_grad = True
             # print("[Debug-Check] " + name + " - True")
+    # Loc forward does not use these heads. Leaving them trainable with
+    # find_unused_parameters makes DDP allreduce undefined grads.
+    for name, param in model.named_parameters():
+        if ('segmentation_' in name) or ('classification_heads' in name):
+            param.requires_grad = False
     return model
 
 
@@ -1975,7 +1980,7 @@ def main(args):
             model,
             device_ids=[args.gpu],
             find_unused_parameters=args.find_unused_params,
-            gradient_as_bucket_view=True,
+            gradient_as_bucket_view=False,
         )
         model_without_ddp = model.module
     n_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)

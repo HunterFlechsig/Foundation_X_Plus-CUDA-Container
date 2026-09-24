@@ -11,7 +11,14 @@ checkpoint with the same `TOTAL_EPOCHS`.
 
 Outputs stay under `/scratch/hflechsi/FoundationX/candidptx_tasksets/`.
 
+Localization lock on two GPUs needs the DDP fix in `main_Consolidated.py`:
+`gradient_as_bucket_view=False`, unused `segmentation_*` and
+`classification_heads` frozen during loc lock, and `--find_unused_params`
+still on the launcher. Do not put the pre-backward `zeros_like` seed back.
+
 ## 0. Update the checkout
+
+The DDP loc-lock fix must be in this checkout before smoke or f/g.
 
 ```bash
 cd ~/path/to/Foundation_X_Plus-CUDA-Container
@@ -20,11 +27,23 @@ git checkout candidptx-tasksets
 git pull origin candidptx-tasksets
 ```
 
-Confirm `--find_unused_params` is on the launcher line, and that
-`main_Consolidated.py` does **not** assign `zeros_like` onto frozen
-gradients before `backward`.
+Confirm all three:
 
-## 1. Smoke of task set (g), one cycle
+```bash
+grep -n 'find_unused_params' scripts-apptainer/run_apptainer_candidptx_taskset.sh
+grep -n 'gradient_as_bucket_view' main_Consolidated.py
+grep -n "segmentation_" main_Consolidated.py | head
+```
+
+`gradient_as_bucket_view` must be `False`. The loc-lock freeze function must
+set `requires_grad = False` for names containing `segmentation_` or
+`classification_heads`. If `git pull` still shows `gradient_as_bucket_view=True`,
+this checkout does not have the fix yet.
+
+## 1. Smoke of task set (f), loc then seg
+
+Localization is epoch 1 of **f**, which is the crash path. Use a separate
+output directory so this does not write into production `f`.
 
 ```bash
 interactive -p htc -q public -A grp_jliang12 -G a100:2 -c 10 --mem=100G -t 0-4
@@ -34,7 +53,9 @@ Inside that allocation:
 
 ```bash
 cd ~/path/to/Foundation_X_Plus-CUDA-Container
-./scripts-apptainer/run_apptainer_candidptx_taskset.sh smoke
+LOGFILE=/scratch/hflechsi/FoundationX/candidptx_tasksets/smoke_f \
+  TOTAL_EPOCHS=3 \
+  ./scripts-apptainer/run_apptainer_candidptx_taskset.sh f
 ```
 
 If `htc` is too short for localization, use public instead:
@@ -43,26 +64,31 @@ If `htc` is too short for localization, use public instead:
 interactive -p public -q public -A grp_jliang12 --gres=gpu:a100:2 -c 10 --mem=100G -t 0-12
 ```
 
-Success is all of:
+Success is:
+
+- The log prints `Localization_CANDIDPTX_A_Train` and
+  `Localization_CANDIDPTX_B_Train` with no
+  `Encountered gradient which is undefined` error.
+- Both checkpoints exist:
 
 ```bash
-ls /scratch/hflechsi/FoundationX/candidptx_tasksets/smoke/ckpt_E1_TH9.pth \
-   /scratch/hflechsi/FoundationX/candidptx_tasksets/smoke/ckpt_E2_TH10.pth \
-   /scratch/hflechsi/FoundationX/candidptx_tasksets/smoke/ckpt_E3_TH11.pth
+ls /scratch/hflechsi/FoundationX/candidptx_tasksets/smoke_f/ckpt_E1_TH10.pth \
+   /scratch/hflechsi/FoundationX/candidptx_tasksets/smoke_f/ckpt_E2_TH11.pth
 ```
 
-and Student plus Teacher rows for classification, localization, and
-segmentation in `export_csvFile.csv` after epoch 1. Then `exit` the
-interactive session.
+Then `exit` the interactive session.
 
-Do not start f, g, or the a–c resumes until that smoke finishes.
+Do not start production f, g, or the a–c resumes until that smoke finishes.
 
 ## 2. Move the failed f and g directories
 
 ```bash
 cd /scratch/hflechsi/FoundationX/candidptx_tasksets
-mv f f_failed_loc
-mv g g_failed_loc
+mv -n f f_failed_loc
+mv -n g g_failed_loc
+# If those names already exist from the earlier crash:
+mv f f_failed_loc_2
+mv g g_failed_loc_2
 ```
 
 ## 3. Start f and g from epoch 1
