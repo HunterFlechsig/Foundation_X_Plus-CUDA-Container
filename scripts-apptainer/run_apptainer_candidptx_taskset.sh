@@ -9,28 +9,31 @@
 #   interactive -p htc -q public -A grp_jliang12 -G a100:2 -c 10 --mem=100G -t 0-4
 #   ./scripts-apptainer/run_apptainer_candidptx_taskset.sh smoke
 #
-# Production jobs:
+# SOL command sequence:
+#   scripts-apptainer/candidptx_sol_commands.md
+#
+# Production jobs (50 cycles, 7-day wall; f and g only — a–e are resumed by hand):
 #   ./scripts-apptainer/submit_candidptx_tasksets.sh
-#   RESUME=/scratch/hflechsi/FoundationX/candidptx_tasksets/a/ckpt_E4_TH9.pth \
-#     sbatch scripts-apptainer/run_apptainer_candidptx_taskset.sh a
+#   RESUME=/scratch/hflechsi/FoundationX/candidptx_tasksets/a/ckpt_E10_TH9.pth \
+#     TOTAL_EPOCHS=51 sbatch --time=7-00:00:00 scripts-apptainer/run_apptainer_candidptx_taskset.sh a
 #
 # The training loop starts at epoch 1 and stops before total_epochs, so
-# total_epochs is one past the last epoch. Ten cycles:
-#   a  candidptxCLS                              epochs 1-10   total_epochs 11   wall 1 day
-#   b  candidptxLOC                              epochs 1-10   total_epochs 11   wall 1 day
-#   c  candidptxSEG                              epochs 1-10   total_epochs 11   wall 1 day
-#   d  candidptxCLS_candidptxLOC                 epochs 1-20   total_epochs 21   wall 2 days
-#   e  candidptxCLS_candidptxSEG                 epochs 1-20   total_epochs 21   wall 2 days
-#   f  candidptxLOC_candidptxSEG                 epochs 1-20   total_epochs 21   wall 2 days
-#   g  candidptxCLS_candidptxLOC_candidptxSEG    epochs 1-30   total_epochs 31   wall 3 days
-#   smoke  same tasks as g, one cycle            epochs 1-3    total_epochs 4
+# total_epochs is one past the last epoch. Fifty cycles:
+#   a  candidptxCLS                              epochs 1-50    total_epochs 51    wall 7 days
+#   b  candidptxLOC                              epochs 1-50    total_epochs 51    wall 7 days
+#   c  candidptxSEG                              epochs 1-50    total_epochs 51    wall 7 days
+#   d  candidptxCLS_candidptxLOC                 epochs 1-100   total_epochs 101   wall 7 days
+#   e  candidptxCLS_candidptxSEG                 epochs 1-100   total_epochs 101   wall 7 days
+#   f  candidptxLOC_candidptxSEG                 epochs 1-100   total_epochs 101   wall 7 days
+#   g  candidptxCLS_candidptxLOC_candidptxSEG    epochs 1-150   total_epochs 151   wall 7 days
+#   smoke  same tasks as g, one cycle            epochs 1-3     total_epochs 4
 
 #SBATCH --job-name=candidptx
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=100G
-#SBATCH --time=3-00:00:00
+#SBATCH --time=7-00:00:00
 #SBATCH -A grp_jliang12
 #SBATCH -p public
 #SBATCH -q public
@@ -61,7 +64,7 @@ ntasks="${#TOKENS[@]}"
 if [[ "$NAME" == "smoke" ]]; then
 	total_epochs="${TOTAL_EPOCHS:-4}"
 else
-	total_epochs="${TOTAL_EPOCHS:-$((10 * ntasks + 1))}"
+	total_epochs="${TOTAL_EPOCHS:-$((50 * ntasks + 1))}"
 fi
 
 CONFIGFILE=config/DINO/DINO_4scale_swinBASE.py

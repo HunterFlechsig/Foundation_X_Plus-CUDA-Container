@@ -1,6 +1,6 @@
 #!/bin/bash
-# Submit the seven CANDID-PTX task-set jobs on public/public under grp_jliang12.
-# Each job uses two A100s. Wall time is 1 day for one task, 2 days for two, 3 days for all three.
+# Submit fresh 50-cycle CANDID-PTX jobs for f and g only.
+# a–c are resumed by hand. d and e wait until their 10-cycle jobs finish.
 #
 #   ./scripts-apptainer/submit_candidptx_tasksets.sh
 
@@ -10,10 +10,9 @@ cd "$(dirname "$0")/.."
 
 submit() {
 	local name="$1"
-	local wall="$2"
 	sbatch \
 		--job-name="candidptx_${name}" \
-		--time="$wall" \
+		--time=7-00:00:00 \
 		--account=grp_jliang12 \
 		--partition=public \
 		--qos=public \
@@ -23,10 +22,5 @@ submit() {
 		scripts-apptainer/run_apptainer_candidptx_taskset.sh "$name"
 }
 
-submit a 1-00:00:00
-submit b 1-00:00:00
-submit c 1-00:00:00
-submit d 2-00:00:00
-submit e 2-00:00:00
-submit f 2-00:00:00
-submit g 3-00:00:00
+submit f
+submit g
