@@ -5,9 +5,10 @@
 # Build the split files once, on a login node, before the first run:
 #   python scripts/build_candidptx_splits.py /scratch/hflechsi/CANDID-PTX
 #
-# Smoke run, inside a four-hour interactive allocation with two A100s:
+# Smoke (loc then seg, own output dir):
+#   sbatch scripts-apptainer/sbatch_candidptx_smoke.sh
 #   interactive -p htc -q public -A grp_jliang12 -G a100:2 -c 10 --mem=100G -t 0-4
-#   ./scripts-apptainer/run_apptainer_candidptx_taskset.sh smoke
+#   LOGFILE=.../smoke_f TOTAL_EPOCHS=3 ./scripts-apptainer/run_apptainer_candidptx_taskset.sh smoke_f
 #
 # SOL command sequence:
 #   scripts-apptainer/candidptx_sol_commands.md
@@ -26,7 +27,8 @@
 #   e  candidptxCLS_candidptxSEG                 epochs 1-100   total_epochs 101   wall 7 days
 #   f  candidptxLOC_candidptxSEG                 epochs 1-100   total_epochs 101   wall 7 days
 #   g  candidptxCLS_candidptxLOC_candidptxSEG    epochs 1-150   total_epochs 151   wall 7 days
-#   smoke  same tasks as g, one cycle            epochs 1-3     total_epochs 4
+#   smoke_f  same tasks as f, one cycle          epochs 1-2     total_epochs 3
+#   smoke    same tasks as g, one cycle          epochs 1-3     total_epochs 4
 
 #SBATCH --job-name=candidptx
 #SBATCH --nodes=1
@@ -52,16 +54,19 @@ case "$NAME" in
 	e) cyclictask=candidptxCLS_candidptxSEG ;;
 	f) cyclictask=candidptxLOC_candidptxSEG ;;
 	g) cyclictask=candidptxCLS_candidptxLOC_candidptxSEG ;;
+	smoke_f) cyclictask=candidptxLOC_candidptxSEG ;;
 	smoke) cyclictask=candidptxCLS_candidptxLOC_candidptxSEG ;;
 	*)
-		echo "Usage: $0 {a|b|c|d|e|f|g|smoke}" >&2
+		echo "Usage: $0 {a|b|c|d|e|f|g|smoke_f|smoke}" >&2
 		exit 1
 		;;
 esac
 
 IFS=_ read -ra TOKENS <<< "$cyclictask"
 ntasks="${#TOKENS[@]}"
-if [[ "$NAME" == "smoke" ]]; then
+if [[ "$NAME" == "smoke_f" ]]; then
+	total_epochs="${TOTAL_EPOCHS:-3}"
+elif [[ "$NAME" == "smoke" ]]; then
 	total_epochs="${TOTAL_EPOCHS:-4}"
 else
 	total_epochs="${TOTAL_EPOCHS:-$((50 * ntasks + 1))}"

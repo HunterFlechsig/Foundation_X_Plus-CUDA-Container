@@ -42,31 +42,27 @@ this checkout does not have the fix yet.
 
 ## 1. Smoke of task set (f), loc then seg
 
-Localization is epoch 1 of **f**, which is the crash path. Use a separate
-output directory so this does not write into production `f`.
-
-```bash
-interactive -p htc -q public -A grp_jliang12 -G a100:2 -c 10 --mem=100G -t 0-4
-```
-
-Inside that allocation:
+Localization is epoch 1 of **f**, which is the crash path. Output goes to
+`smoke_f`, not production `f`. From the repo checkout:
 
 ```bash
 cd ~/path/to/Foundation_X_Plus-CUDA-Container
-LOGFILE=/scratch/hflechsi/FoundationX/candidptx_tasksets/smoke_f \
-  TOTAL_EPOCHS=3 \
-  ./scripts-apptainer/run_apptainer_candidptx_taskset.sh f
+sbatch scripts-apptainer/sbatch_candidptx_smoke.sh
 ```
 
-If `htc` is too short for localization, use public instead:
+That job is 12 hours, two A100s, `public` / `public`, account `grp_jliang12`.
+Slurm stdout is `candidptx_smoke_f_<jobid>.out` in the directory where you
+ran `sbatch`.
+
+To watch it:
 
 ```bash
-interactive -p public -q public -A grp_jliang12 --gres=gpu:a100:2 -c 10 --mem=100G -t 0-12
+squeue -u "$USER" -n candidptx_smoke_f
 ```
 
 Success is:
 
-- The log prints `Localization_CANDIDPTX_A_Train` and
+- The `.out` / `.err` logs print `Localization_CANDIDPTX_A_Train` and
   `Localization_CANDIDPTX_B_Train` with no
   `Encountered gradient which is undefined` error.
 - Both checkpoints exist:
@@ -76,9 +72,17 @@ ls /scratch/hflechsi/FoundationX/candidptx_tasksets/smoke_f/ckpt_E1_TH10.pth \
    /scratch/hflechsi/FoundationX/candidptx_tasksets/smoke_f/ckpt_E2_TH11.pth
 ```
 
-Then `exit` the interactive session.
-
 Do not start production f, g, or the a–c resumes until that smoke finishes.
+
+Interactive, if you would rather watch it live:
+
+```bash
+interactive -p public -q public -A grp_jliang12 --gres=gpu:a100:2 -c 10 --mem=100G -t 0-12
+cd ~/path/to/Foundation_X_Plus-CUDA-Container
+LOGFILE=/scratch/hflechsi/FoundationX/candidptx_tasksets/smoke_f \
+  TOTAL_EPOCHS=3 \
+  ./scripts-apptainer/run_apptainer_candidptx_taskset.sh smoke_f
+```
 
 ## 2. Move the failed f and g directories
 
