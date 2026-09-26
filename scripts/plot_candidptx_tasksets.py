@@ -115,6 +115,22 @@ def collapse_epochs(points: list[ScorePoint]) -> list[ScorePoint]:
     return [by_epoch[epoch] for epoch in sorted(by_epoch)]
 
 
+def dataset_and_trained_task(row: dict[str, str]) -> tuple[str, str]:
+    """Return the collection name and the task trained this epoch.
+
+    The CSV header is Epoch, Dataset, Task-Train. The training loop appends
+    Epoch, task_todo, dataset, so those two cells are stored under each
+    other's names.
+    """
+    dataset_cell = (row.get("Dataset") or "").strip()
+    train_cell = (row.get("Task-Train") or "").strip()
+    if dataset_cell.upper() == "CANDID-PTX" and task_named(train_cell):
+        return dataset_cell, train_cell
+    if train_cell.upper() == "CANDID-PTX" and task_named(dataset_cell):
+        return train_cell, dataset_cell
+    return dataset_cell, train_cell
+
+
 def load_run(csv_path: Path) -> dict[str, dict[str, list[ScorePoint]]]:
     with csv_path.open(newline="") as handle:
         reader = csv.DictReader(handle)
@@ -127,20 +143,20 @@ def load_run(csv_path: Path) -> dict[str, dict[str, list[ScorePoint]]]:
             task: {model: [] for model in MODELS} for task in TASKS
         }
         for row_number, row in enumerate(reader, start=2):
-            dataset = (row.get("Dataset") or "").strip()
+            dataset, trained_text = dataset_and_trained_task(row)
             if dataset.upper() != "CANDID-PTX":
                 continue
             model = (row.get("Model") or "").strip().capitalize()
             if model not in MODELS:
                 continue
             evaluated = task_named(row.get("Task-Test") or "")
-            trained = task_named(row.get("Task-Train") or "")
+            trained = task_named(trained_text)
             if evaluated is None:
                 continue
             if trained is None:
                 raise ValueError(
                     f"{csv_path}:{row_number} Task-Train does not name a task: "
-                    f"{row.get('Task-Train')!r}"
+                    f"{trained_text!r}"
                 )
             value = parse_number(row.get(METRIC_COLUMN[evaluated]) or "")
             if value is None:
@@ -287,6 +303,8 @@ def compare(root: Path, output: Path) -> list[dict[str, str]]:
             missing.append(task_set)
             continue
         found[task_set] = load_run(csv_path)
+        if not any(points for models in found[task_set].values() for points in models.values()):
+            print(f"Warning: {csv_path} has no CANDID-PTX scores to plot", file=sys.stderr)
         warn_outside_scale(task_set, found[task_set])
         for task in TASKS:
             figure_path = output / f"{task_set}_{TASK_LABEL[task].lower()}.png"

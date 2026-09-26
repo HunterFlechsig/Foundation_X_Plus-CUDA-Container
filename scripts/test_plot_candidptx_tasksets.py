@@ -73,6 +73,23 @@ class LoadRunTest(unittest.TestCase):
             loaded = plot.load_run(path / "export_csvFile.csv")
         self.assertEqual(loaded["SEG"]["Student"], [plot.ScorePoint(2, 22, True)])
 
+    def test_trainer_writes_the_trained_task_under_the_dataset_header(self):
+        """The header says Dataset, Task-Train. Each appended row is task, dataset."""
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp)
+            write_csv(
+                path,
+                [
+                    "1,Classification_CANDIDPTX_B_Train,CANDID-PTX,Student,Classification_CANDID-PTX,80,-,-,-,-",
+                    "1,Classification_CANDIDPTX_B_Train,CANDID-PTX,Teacher,Classification_CANDID-PTX,70,-,-,-,-",
+                    "1,Classification_CANDIDPTX_B_Train,CANDID-PTX,Student,Localization_CANDID-PTX,-,-,12,-,-",
+                ],
+            )
+            loaded = plot.load_run(path / "export_csvFile.csv")
+        self.assertEqual(loaded["CLS"]["Student"], [plot.ScorePoint(1, 80, True)])
+        self.assertEqual(loaded["CLS"]["Teacher"], [plot.ScorePoint(1, 70, True)])
+        self.assertEqual(loaded["LOC"]["Student"], [plot.ScorePoint(1, 12, False)])
+
     def test_blank_task_train_is_an_error(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp)
